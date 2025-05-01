@@ -1,0 +1,19 @@
+/* Admin mode styles */
+body.admin-mode .transparent-header,
+body.admin-mode footer {
+  display: none !important;
+}
+
+body.admin-mode {
+  min-height: 100vh;
+}
+
+/* Make sure admin components take the full height */
+.admin-login-container {
+  min-height: 100vh !important;
+}
+
+/* Target v-app directly in admin mode */
+body.admin-mode .v-application--wrap > .v-container.transparent-header {
+  display: none !important;
+} 
