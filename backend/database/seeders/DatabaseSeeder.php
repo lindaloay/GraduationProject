@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
         // Seed business categories
         $this->call([
             BusinessCategorySeeder::class,
+            DefaultRatingAspectsSeeder::class,
         ]);
     }
 }
