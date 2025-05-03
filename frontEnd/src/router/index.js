@@ -19,6 +19,7 @@ import AdminDashboard from "@/views/admin/Dashboard.vue";
 import AdminUsers from "@/views/admin/Users.vue";
 import AdminCategories from "@/views/admin/Categories.vue";
 import AdminFeedbacks from "@/views/admin/Feedbacks.vue";
+import AdminRatingAspects from "@/views/admin/RatingAspects.vue";
 import { globalState } from "@/state";
 import api from "@/services/api";
 import Businesses from "@/views/admin/Businesses.vue";
@@ -151,6 +152,12 @@ const routes = [
       requiresAdmin: true,
       adminLayout: true
     }
+  },
+  {
+    path: "/admin/rating-aspects",
+    name: "AdminRatingAspects",
+    component: AdminRatingAspects,
+    meta: { requiresAdmin: true, adminLayout: true }
   }
 ];
 

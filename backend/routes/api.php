@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\BusinessController as AdminBusinessController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
+use App\Http\Controllers\Admin\RatingAspectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,6 +46,11 @@ Route::get('/business-categories', [ApiBusiness::class, 'getCategories']);
 Route::get('/categories', [BusinessCategoryController::class, 'index']);
 Route::get('/categories/{id}', [BusinessCategoryController::class, 'show']);
 Route::get('/categories/{id}/businesses', [BusinessCategoryController::class, 'getBusinessesByCategory']);
+
+// Rating Aspects routes
+Route::get('/rating-aspects', [RatingAspectController::class, 'index']);
+Route::get('/rating-aspects/{id}', [RatingAspectController::class, 'show']);
+Route::get('/rating-aspects/category/{category_id}', [RatingAspectController::class, 'getByCategory']);
 
 // Admin routes
 Route::prefix('admin')->group(function () {
@@ -88,6 +94,11 @@ Route::prefix('admin')->group(function () {
         Route::put('/users/{id}', [AdminUserController::class, 'update']);
         Route::patch('/users/{id}/toggle-status', [AdminUserController::class, 'toggleStatus']);
         Route::post('/users/{id}/reset-password', [AdminUserController::class, 'resetPassword']);
+
+        // Admin Rating Aspects Management routes
+        Route::post('/rating-aspects', [RatingAspectController::class, 'store']);
+        Route::put('/rating-aspects/{id}', [RatingAspectController::class, 'update']);
+        Route::delete('/rating-aspects/{id}', [RatingAspectController::class, 'destroy']);
     });
 });
 

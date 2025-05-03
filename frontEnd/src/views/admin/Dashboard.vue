@@ -785,10 +785,11 @@ export default {
       ],
       menuItems: [
         { title: 'لوحة التحكم', icon: 'mdi-view-dashboard', route: '/admin/dashboard', exact: true },
-        { title: 'المستخدمين', icon: 'mdi-account-group', route: '/admin/users', exact: false },
-        { title: 'الأعمال', icon: 'mdi-store', route: '/admin/businesses', exact: false },
-        { title: 'التصنيفات', icon: 'mdi-shape', route: '/admin/categories', exact: false },
-        { title: 'التقييمات', icon: 'mdi-comment-text-multiple', route: '/admin/feedbacks', exact: false },
+        { title: 'المستخدمين', icon: 'mdi-account-group', route: '/admin/users' },
+        { title: 'الأعمال', icon: 'mdi-store', route: '/admin/businesses' },
+        { title: 'التصنيفات', icon: 'mdi-shape', route: '/admin/categories' },
+        { title: 'التقييمات', icon: 'mdi-comment-text', route: '/admin/feedbacks' },
+        { title: 'محاور التقييم', icon: 'mdi-star', route: '/admin/rating-aspects' }
       ],
       userDialog: false,
       selectedUser: null,
