@@ -1,67 +1,10 @@
 <template>
   <v-app>
     <!-- Admin Navigation Drawer -->
-    <v-navigation-drawer
-      v-model="drawer"
-      app
-      dark
-      color="primary"
-      class="admin-sidebar"
-      :mini-variant="miniVariant"
-    >
-      <v-list-item class="px-2 admin-header">
-        <v-list-item-avatar>
-          <v-icon size="40">mdi-shield-account</v-icon>
-        </v-list-item-avatar>
-        <v-list-item-content>
-          <v-list-item-title class="text-h6 font-weight-bold">
-            BizAdvisor
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            لوحة تحكم الإدارة
-          </v-list-item-subtitle>
-        </v-list-item-content>
-        <v-btn
-          icon
-          @click.stop="miniVariant = !miniVariant"
-        >
-          <v-icon>{{ miniVariant ? 'mdi-chevron-right' : 'mdi-chevron-left' }}</v-icon>
-        </v-btn>
-      </v-list-item>
-
-      <v-divider></v-divider>
-
-      <v-list dense nav>
-        <v-list-item
-          v-for="(item, i) in menuItems"
-          :key="i"
-          :to="item.route"
-          link
-          :exact="item.exact"
-        >
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-      
-      <template #append>
-        <v-divider></v-divider>
-        <v-list dense>
-          <v-list-item link @click="logout" class="logout-item">
-            <v-list-item-icon>
-              <v-icon>mdi-logout</v-icon>
-            </v-list-item-icon>
-            <v-list-item-content>
-              <v-list-item-title>تسجيل الخروج</v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
-      </template>
-    </v-navigation-drawer>
+    <admin-sidebar 
+      :drawer.sync="drawer"
+      :mini.sync="miniVariant"
+    />
 
     <!-- App Bar -->
     <v-app-bar app dark color="primary" elevation="2">
@@ -411,9 +354,13 @@
 
 <script>
 import api from '@/services/api';
+import AdminSidebar from "@/components/admin/AdminSidebar.vue";
 
 export default {
   name: 'AdminCategories',
+  components: {
+    AdminSidebar
+  },
   data() {
     return {
       drawer: true,
