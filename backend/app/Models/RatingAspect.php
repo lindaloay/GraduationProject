@@ -12,7 +12,12 @@ class RatingAspect extends Model
     protected $fillable = [
         'name',
         'description',
-        'category_id'
+        'category_id',
+        'is_user_created'
+    ];
+
+    protected $casts = [
+        'is_user_created' => 'boolean'
     ];
 
     public function category()

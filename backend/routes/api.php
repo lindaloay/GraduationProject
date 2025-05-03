@@ -35,6 +35,7 @@ Route::get('/business/image/{path}', [BusinessController::class, 'getImage']);
 Route::get('/businesses', [BusinessController::class, 'getAllBusinesses']);
 Route::get('/businesses/{id}', [BusinessController::class, 'getBusinessById']);
 Route::get('/businesses/{id}/feedbacks', [FeedbackController::class, 'getBusinessFeedbacks']);
+Route::get('/businesses/{id}/rating-aspects', [FeedbackController::class, 'getBusinessRatingAspects']);
 Route::get('/businesses/{businessId}/favorites/count', [FavoriteController::class, 'getFavoritesCount']);
 
 // Updated API routes with enhanced search and filtering

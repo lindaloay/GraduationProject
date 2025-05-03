@@ -53,7 +53,6 @@
                       color="amber"
                       background-color="rgba(255,255,255,0.3)"
                       dense
-                      half-increments
                       readonly
                       size="18"
                     ></v-rating>
@@ -263,6 +262,28 @@
                             size="14"
                           ></v-rating>
                           <span class="rating-value">{{ feedback.rating }}</span>
+                        </div>
+                      </div>
+                      
+                      <!-- Aspect Ratings -->
+                      <div v-if="feedback.aspect_ratings && feedback.aspect_ratings.length > 0" class="feedback-aspect-ratings">
+                        <div 
+                          v-for="aspectRating in feedback.aspect_ratings" 
+                          :key="aspectRating.id"
+                          class="feedback-aspect-rating-item"
+                        >
+                          <div class="feedback-aspect-name">{{ aspectRating.aspect.name }}:</div>
+                          <div class="feedback-aspect-rating">
+                            <v-rating
+                              :value="aspectRating.rating"
+                              color="amber"
+                              background-color="grey lighten-3"
+                              readonly
+                              dense
+                              small
+                            ></v-rating>
+                            <span class="aspect-rating-value">{{ aspectRating.rating }}</span>
+                          </div>
                         </div>
                       </div>
                       
@@ -499,7 +520,13 @@
       </v-dialog>
 
       <!-- Feedback Dialog -->
-      <v-dialog v-model="dialog" max-width="500px" transition="dialog-bottom-transition">
+      <v-dialog 
+        v-model="dialog" 
+        max-width="500px" 
+        transition="dialog-bottom-transition"
+        @click:outside="resetFeedbackForm"
+        @keydown.esc="resetFeedbackForm"
+      >
         <v-card class="feedback-dialog">
           <v-card-title class="dialog-title">
             <v-icon color="primary" class="dialog-icon">mdi-star-outline</v-icon>
@@ -507,23 +534,123 @@
           </v-card-title>
           
           <v-card-text class="dialog-content">
-            <div class="rating-section">
-              <div class="rating-header">
-                <span class="rating-label">تقييمك</span>
-                <div class="rating-value-display">
-                  <span class="dialog-rating-value">{{ rating }}</span>
-                  <span class="rating-max">/5</span>
+            <!-- Rating Aspects -->
+            <div v-if="ratingAspects && ratingAspects.length > 0" class="aspect-ratings-section">
+              <div class="aspect-ratings-title">تقييم الجوانب المختلفة</div>
+              
+              <div 
+                v-for="aspect in ratingAspects" 
+                :key="aspect.id" 
+                class="aspect-rating-item"
+              >
+                <div class="aspect-rating-header">
+                  <div class="aspect-name-container">
+                    <span class="aspect-name">{{ aspect.name }}</span>
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon 
+                          v-bind="attrs"
+                          v-on="on"
+                          small
+                          color="grey lighten-1"
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </template>
+                      <span>{{ aspect.description }}</span>
+                    </v-tooltip>
+                  </div>
+                  <div class="aspect-rating-value">
+                    <span>{{ aspectRatings[aspect.id] || 0 }}</span>
+                    <span class="rating-max">/5</span>
+                  </div>
+                </div>
+                
+                <v-rating
+                  :value="aspectRatings[aspect.id] || 0"
+                  color="amber"
+                  background-color="grey lighten-3"
+                  hover
+                  dense
+                  class="aspect-rating-stars"
+                  @input="onRatingChange(aspect.id, $event)"
+                ></v-rating>
+              </div>
+              
+              <!-- Custom Aspects Section -->
+              <div v-for="(customAspect, index) in customRatingAspects" :key="`custom-${index}`" class="aspect-rating-item custom-aspect-item">
+                <div class="aspect-rating-header">
+                  <div class="aspect-name-container">
+                    <span class="aspect-name">{{ customAspect.name }}</span>
+                  </div>
+                  <div class="custom-aspect-actions">
+                    <v-btn icon x-small color="error" @click="removeCustomAspect(index)" class="remove-aspect-btn">
+                      <v-icon small>mdi-close</v-icon>
+                    </v-btn>
+                    <div class="aspect-rating-value">
+                      <span>{{ customAspect.rating || 0 }}</span>
+                      <span class="rating-max">/5</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <v-rating
+                  :value="customAspect.rating || 0"
+                  color="amber"
+                  background-color="grey lighten-3"
+                  hover
+                  dense
+                  class="aspect-rating-stars"
+                  @input="onCustomRatingChange(index, $event)"
+                ></v-rating>
+              </div>
+              
+              <!-- Add Custom Aspect Section -->
+              <div class="add-custom-aspect" v-if="showCustomAspectForm">
+                <v-text-field
+                  v-model="newAspectName"
+                  label="اسم الجانب الجديد"
+                  outlined
+                  dense
+                  hide-details="auto"
+                  class="custom-aspect-input"
+                  dir="rtl"
+                ></v-text-field>
+                
+                <div class="custom-aspect-actions">
+                  <v-btn 
+                    small 
+                    color="primary" 
+                    @click="addCustomAspect" 
+                    :disabled="!newAspectName.trim()"
+                    class="add-aspect-btn"
+                  >
+                    إضافة
+                  </v-btn>
+                  <v-btn 
+                    small 
+                    text 
+                    @click="showCustomAspectForm = false"
+                    class="cancel-aspect-btn"
+                  >
+                    إلغاء
+                  </v-btn>
                 </div>
               </div>
               
-              <v-rating
-                v-model="rating"
-                color="amber"
-                background-color="grey lighten-3"
-                hover
-                size="48"
-                class="rating-stars"
-              ></v-rating>
+              <!-- Button to show the add custom aspect form -->
+              <div class="add-aspect-container" v-if="!showCustomAspectForm">
+                <v-btn 
+                  text 
+                  color="primary" 
+                  block 
+                  class="add-aspect-trigger-btn"
+                  @click="showCustomAspectForm = true"
+                >
+                  <v-icon left>mdi-plus</v-icon>
+                  إضافة جانب جديد للتقييم
+                </v-btn>
+              </div>
             </div>
             
             <v-textarea
@@ -544,7 +671,7 @@
               color="primary"
               rounded
               class="submit-btn"
-              :disabled="!rating"
+              :disabled="!canSubmitFeedback"
               :loading="submitting"
               @click="submitFeedback"
             >
@@ -556,7 +683,7 @@
               text
               color="grey darken-1"
               class="cancel-btn"
-              @click="dialog = false"
+              @click="resetFeedbackForm"
             >
               إلغاء
             </v-btn>
@@ -615,7 +742,6 @@ export default {
       business: null,
       galleryImages: [],
       dialog: false,
-      rating: 0,
       comment: '',
       carouselModel: 0,
       snackbar: {
@@ -628,7 +754,12 @@ export default {
       currentImageIndex: 0,
       isFavorite: false,
       favoriteLoading: false,
-      favoritesCount: 0
+      favoritesCount: 0,
+      ratingAspects: [],
+      aspectRatings: {},
+      customRatingAspects: [],
+      showCustomAspectForm: false,
+      newAspectName: ''
     };
   },
   computed: {
@@ -645,6 +776,30 @@ export default {
     },
     isLoggedIn() {
       return authService.isTokenValid();
+    },
+    canSubmitFeedback() {
+      // Check if all predefined aspect ratings have values
+      const predefinedAspectsValid = this.ratingAspects.every(aspect => 
+        this.aspectRatings[aspect.id] && this.aspectRatings[aspect.id] > 0
+      );
+      
+      // Check if all custom aspects have ratings
+      const customAspectsValid = this.customRatingAspects.every(aspect => 
+        aspect.rating && aspect.rating > 0
+      );
+      
+      // Both predefined and custom aspects (if any) must be valid
+      return predefinedAspectsValid && 
+             (this.customRatingAspects.length === 0 || customAspectsValid);
+    }
+  },
+  watch: {
+    dialog(newVal) {
+      if (newVal === true) {
+        // Dialog opened - reset form
+        this.resetAspectRatings();
+        this.comment = '';
+      }
     }
   },
   methods: {
@@ -692,6 +847,9 @@ export default {
             this.business.feedbacks = feedbacksResponse.data.feedbacks;
           }
           
+          // Fetch rating aspects separately
+          await this.fetchBusinessRatingAspects();
+          
           // Check if business is favorited (if user is logged in)
           if (this.isLoggedIn) {
             await this.checkFavoriteStatus();
@@ -712,21 +870,53 @@ export default {
     async submitFeedback() {
       try {
         this.submitting = true;
+        
+        // Prepare aspect ratings data
+        const aspectRatingsArray = [];
+        
+        // Add predefined aspect ratings
+        if (this.ratingAspects && this.ratingAspects.length > 0) {
+          for (const aspect of this.ratingAspects) {
+            const rating = this.aspectRatings[aspect.id] || 0;
+            if (rating > 0) {
+              aspectRatingsArray.push({
+                aspect_id: aspect.id,
+                rating: rating
+              });
+            }
+          }
+        }
+        
+        // Add custom aspect ratings
+        if (this.customRatingAspects.length > 0) {
+          for (const customAspect of this.customRatingAspects) {
+            if (customAspect.rating > 0) {
+              aspectRatingsArray.push({
+                aspect_id: 'custom',  // Temporary ID that will be processed by the backend
+                name: customAspect.name,
+                rating: customAspect.rating,
+                is_custom: true
+              });
+            }
+          }
+        }
+        
         const response = await api.post('/feedback', {
           business_id: this.businessId,
-          rating: this.rating,
-          comment: this.comment
+          comment: this.comment,
+          aspect_ratings: aspectRatingsArray
         });
 
         if (response.data.status === 'success') {
           this.dialog = false;
-          this.rating = 0;
           this.comment = '';
+          // Reset all ratings
+          this.resetFeedbackForm();
           this.showSnackbar('تم إرسال تقييمك بنجاح', 'success');
           await this.fetchBusinessDetails();
         }
       } catch (err) {
-        this.showSnackbar(err.response.data.message, 'error');
+        this.showSnackbar(err.response?.data?.message || 'حدث خطأ أثناء إرسال التقييم', 'error');
         console.error('Error submitting feedback:', err);
       } finally {
         this.submitting = false;
@@ -862,6 +1052,60 @@ export default {
       } catch (error) {
         console.error('Error fetching favorites count:', error);
       }
+    },
+    onRatingChange(aspectId, value) {
+      // Use Vue.set to ensure reactivity
+      this.$set(this.aspectRatings, aspectId, parseInt(value));
+      console.log(`Rating for aspect ${aspectId} set to ${value}`);
+    },
+    onCustomRatingChange(index, value) {
+      // Update the rating for a custom aspect
+      this.$set(this.customRatingAspects[index], 'rating', parseInt(value));
+    },
+    addCustomAspect() {
+      if (this.newAspectName.trim()) {
+        this.customRatingAspects.push({
+          name: this.newAspectName.trim(),
+          rating: 0,
+          is_custom: true
+        });
+        this.newAspectName = '';
+        this.showCustomAspectForm = false;
+      }
+    },
+    removeCustomAspect(index) {
+      this.customRatingAspects.splice(index, 1);
+    },
+    async fetchBusinessRatingAspects() {
+      try {
+        const response = await api.get(`/businesses/${this.businessId}/rating-aspects`);
+        if (response.data.status === 'success') {
+          this.ratingAspects = response.data.rating_aspects;
+          
+          // Initialize aspect ratings with zeros
+          this.ratingAspects.forEach(aspect => {
+            this.$set(this.aspectRatings, aspect.id, 0);
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching rating aspects:', error);
+      }
+    },
+    resetAspectRatings() {
+      // Clear all aspect ratings
+      if (this.ratingAspects) {
+        this.ratingAspects.forEach(aspect => {
+          this.$set(this.aspectRatings, aspect.id, 0);
+        });
+      }
+    },
+    resetFeedbackForm() {
+      this.dialog = false;
+      this.comment = '';
+      this.resetAspectRatings();
+      this.customRatingAspects = [];
+      this.showCustomAspectForm = false;
+      this.newAspectName = '';
     }
   },
   async created() {
@@ -1363,40 +1607,9 @@ export default {
   padding: 20px;
 }
 
-.rating-section {
-  margin-bottom: 20px;
-}
-
-.rating-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.rating-label {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.rating-value-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.rating-value {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
 .rating-max {
   font-size: 0.8rem;
   font-weight: 500;
-}
-
-.rating-stars {
-  margin-bottom: 16px;
 }
 
 .comment-textarea {
@@ -1438,6 +1651,8 @@ export default {
   background: white;
   border-radius: 16px;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
 .gallery-toolbar {
@@ -1629,4 +1844,135 @@ export default {
     box-shadow: 0 0 0 0 rgba(255, 90, 88, 0);
   }
 }
+
+/* Rating Aspects Styling */
+.aspect-ratings-section {
+  margin-top: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 16px;
+}
+
+.aspect-ratings-title {
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: #424242;
+  font-size: 16px;
+}
+
+.aspect-rating-item {
+  margin-bottom: 16px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+  padding-bottom: 16px;
+}
+
+.aspect-rating-item:last-child {
+  border-bottom: none;
+}
+
+.aspect-rating-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.aspect-name-container {
+  display: flex;
+  align-items: center;
+}
+
+.aspect-name {
+  font-weight: 500;
+  margin-right: 8px;
+}
+
+.aspect-rating-value {
+  font-weight: 500;
+  color: #F57C00;
+}
+
+.aspect-rating-stars {
+  margin-right: -8px; /* Align with the padding of the container */
+}
+
+/* Feedback Aspect Ratings */
+.feedback-aspect-ratings {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.feedback-aspect-rating-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.feedback-aspect-name {
+  min-width: 100px;
+  font-size: 0.9rem;
+  color: #616161;
+}
+
+.feedback-aspect-rating {
+  display: flex;
+  align-items: center;
+}
+
+.aspect-rating-value {
+  font-size: 0.9rem;
+  margin-left: 8px;
+  color: #F57C00;
+  font-weight: 500;
+}
+
+/* Custom Aspect Styling */
+.custom-aspect-item {
+  background-color: rgba(255, 248, 225, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  position: relative;
+}
+
+.custom-aspect-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.remove-aspect-btn {
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.remove-aspect-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.add-custom-aspect {
+  margin-top: 16px;
+  border: 1px dashed rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.custom-aspect-input {
+  margin-bottom: 12px;
+}
+
+.add-aspect-container {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.add-aspect-trigger-btn {
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.add-aspect-btn {
+  margin-right: 8px;
+}
 </style>
+

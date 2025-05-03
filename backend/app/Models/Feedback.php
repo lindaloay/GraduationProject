@@ -27,4 +27,9 @@ class Feedback extends Model
     {
         return $this->belongsTo(Business::class);
     }
+
+    public function aspectRatings()
+    {
+        return $this->hasMany(FeedbackAspectRating::class);
+    }
 } 

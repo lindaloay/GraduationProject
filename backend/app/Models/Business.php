@@ -116,9 +116,33 @@ class Business extends Model
 
     public function updateRating()
     {
-        $averageRating = $this->feedbacks()->avg('rating');
-        $this->rating = round($averageRating, 1);
-        $this->rating_count = $this->feedbacks()->count();
+        // Get all feedback records for this business
+        $feedbacks = $this->feedbacks()->with('aspectRatings')->get();
+        
+        if ($feedbacks->isEmpty()) {
+            $this->rating = 0;
+            $this->rating_count = 0;
+            $this->save();
+            return;
+        }
+        
+        $totalRating = 0;
+        $ratingCount = $feedbacks->count();
+        
+        // Calculate average rating based on aspect ratings
+        foreach ($feedbacks as $feedback) {
+            // For each feedback, get the average of its aspect ratings
+            $aspectRatings = $feedback->aspectRatings;
+            if ($aspectRatings->isNotEmpty()) {
+                $totalRating += round($aspectRatings->avg('rating'));
+            } else {
+                // If no aspect ratings, use the overall rating
+                $totalRating += $feedback->rating;
+            }
+        }
+        
+        $this->rating = round($totalRating / $ratingCount);
+        $this->rating_count = $ratingCount;
         $this->save();
     }
 
