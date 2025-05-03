@@ -307,6 +307,36 @@
                 <div class="detail-label">التاريخ</div>
                 <div class="detail-value">{{ formatDate(selectedFeedback.created_at) }}</div>
               </div>
+              
+              <!-- Aspect Ratings -->
+              <div v-if="selectedFeedback.aspect_ratings && selectedFeedback.aspect_ratings.length > 0" class="aspect-ratings-container mt-3">
+                <div class="detail-label mb-2">تقييم الجوانب</div>
+                <div class="aspect-ratings-list">
+                  <div 
+                    v-for="aspectRating in selectedFeedback.aspect_ratings" 
+                    :key="aspectRating.id"
+                    class="aspect-rating-item"
+                    :class="{ 'user-created-aspect': aspectRating.aspect && aspectRating.aspect.is_user_created }"
+                  >
+                    <div class="aspect-name">
+                      {{ aspectRating.aspect ? aspectRating.aspect.name : 'Aspect' }}
+                      <v-chip x-small color="primary" text-color="white" class="ml-2" v-if="aspectRating.aspect && aspectRating.aspect.is_user_created">
+                        مخصص
+                      </v-chip>
+                    </div>
+                    <div class="aspect-rating">
+                      <v-rating
+                        :value="aspectRating.rating"
+                        color="amber"
+                        dense
+                        readonly
+                        size="18"
+                      ></v-rating>
+                      <span class="rating-value ml-1">{{ aspectRating.rating }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </v-col>
             
             <v-col cols="12">
@@ -811,5 +841,47 @@ export default {
 .v-list-item .v-list-item__content {
   padding-right: 8px !important;
   margin-right: 8px !important;
+}
+
+.aspect-ratings-container {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.aspect-ratings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aspect-rating-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border-right: 3px solid #1976d2;
+}
+
+.aspect-rating-item.user-created-aspect {
+  border-right-color: #ff9800;
+  background-color: #fff8e1;
+}
+
+.aspect-name {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.aspect-rating {
+  display: flex;
+  align-items: center;
+}
+
+.rating-value {
+  font-weight: 500;
 }
 </style> 

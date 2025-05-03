@@ -1613,3 +1613,5 @@ Did you mean one of these?
 #35 /Users/alimadhoun/Desktop/GraduationProject/backend/artisan(16): Illuminate\\Foundation\\Application->handleCommand(Object(Symfony\\Component\\Console\\Input\\ArgvInput))
 #36 {main}
 "} 
+[2025-05-03 12:45:06] local.INFO: Aspect ratings from model {"has_aspectRatings":true,"count":3} 
+[2025-05-03 12:45:46] local.INFO: Aspect ratings from model {"has_aspectRatings":true,"count":2} 

@@ -17,6 +17,13 @@ class Feedback extends Model
         'rating',
         'comment'
     ];
+    
+    protected $appends = ['aspect_ratings'];
+    
+    public function getAspectRatingsAttribute()
+    {
+        return $this->aspectRatings()->with('aspect')->get();
+    }
 
     public function user()
     {

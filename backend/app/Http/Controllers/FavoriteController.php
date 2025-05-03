@@ -94,8 +94,13 @@ class FavoriteController extends Controller
     {
         $user = Auth::user();
         $favorites = $user->favoritedBusinesses()
-            ->with(['user:id,name,email'])
-            ->get();
+            ->with(['user:id,name,email', 'mainPicture'])
+            ->get()
+            ->each(function($business) {
+                $business->main_picture = $business->getMainPictureUrlAttribute();
+                $business->main_picture_url = $business->mainPictureUrl;
+                $business->gallery_picture_urls = $business->galleryPicturesUrls;
+            });
 
         return response()->json([
             'status' => 'success',

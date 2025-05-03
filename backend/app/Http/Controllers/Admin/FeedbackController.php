@@ -109,7 +109,8 @@ class FeedbackController extends Controller
             $feedback = Feedback::with([
                 'user:id,name,email,phone,is_business_owner,is_admin',
                 'business',
-                'business.category'
+                'business.category',
+                'aspectRatings.aspect'
             ])->findOrFail($id);
             
             $feedback->created_since = $this->getTimeSince($feedback->created_at);
