@@ -271,8 +271,12 @@
                           v-for="aspectRating in feedback.aspect_ratings" 
                           :key="aspectRating.id"
                           class="feedback-aspect-rating-item"
+                          :class="{ 'user-created-aspect': aspectRating.aspect.is_user_created }"
                         >
-                          <div class="feedback-aspect-name">{{ aspectRating.aspect.name }}:</div>
+                          <div class="feedback-aspect-name">
+                            {{ aspectRating.aspect.name }}
+                            <v-chip x-small v-if="aspectRating.aspect.is_user_created" class="user-created-chip">مخصص</v-chip>
+                          </div>
                           <div class="feedback-aspect-rating">
                             <v-rating
                               :value="aspectRating.rating"
@@ -1973,6 +1977,21 @@ export default {
 
 .add-aspect-btn {
   margin-right: 8px;
+}
+
+/* User-created aspect styling */
+.user-created-aspect {
+  background-color: rgba(255, 248, 225, 0.3);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.user-created-chip {
+  margin-right: 8px;
+  background-color: #FBC02D !important;
+  color: white;
+  font-size: 10px;
+  height: 16px !important;
 }
 </style>
 

@@ -65,12 +65,11 @@ class FeedbackController extends Controller
                 
                 // Check if this is a custom aspect
                 if (isset($aspectRating['is_custom']) && $aspectRating['is_custom'] && isset($aspectRating['name'])) {
-                    // Create a new rating aspect
-                    $business = Business::find($request->business_id);
+                    // Create a new one-time rating aspect not tied to a specific category
                     $newAspect = RatingAspect::create([
                         'name' => $aspectRating['name'],
                         'description' => 'تقييم مضاف بواسطة المستخدم',
-                        'category_id' => $business->category_id,
+                        'category_id' => null, // Not attached to any category
                         'is_user_created' => true
                     ]);
                     $aspectId = $newAspect->id;
@@ -111,7 +110,7 @@ class FeedbackController extends Controller
             $feedbacks = Feedback::where('business_id', $businessId)
                 ->with([
                     'user:id,name',
-                    'aspectRatings.aspect:id,name,description'
+                    'aspectRatings.aspect:id,name,description,is_user_created'
                 ])
                 ->select('id', 'user_id', 'rating', 'comment', 'created_at')
                 ->orderBy('created_at', 'desc')
@@ -135,8 +134,9 @@ class FeedbackController extends Controller
             // Get the business category
             $business = Business::findOrFail($businessId);
             
-            // Get rating aspects for this business category
+            // Get only non-user-created rating aspects for this business category
             $ratingAspects = RatingAspect::where('category_id', $business->category_id)
+                ->where('is_user_created', false)
                 ->select('id', 'name', 'description', 'is_user_created')
                 ->get();
                 

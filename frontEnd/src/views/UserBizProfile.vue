@@ -250,6 +250,32 @@
                         <p class="feedback-text">{{ feedback.comment }}</p>
                       </div>
                       
+                      <!-- Aspect Ratings -->
+                      <div v-if="feedback.aspect_ratings && feedback.aspect_ratings.length > 0" class="feedback-aspect-ratings">
+                        <div 
+                          v-for="aspectRating in feedback.aspect_ratings" 
+                          :key="aspectRating.id"
+                          class="feedback-aspect-rating-item"
+                          :class="{ 'user-created-aspect': aspectRating.aspect.is_user_created }"
+                        >
+                          <div class="feedback-aspect-name">
+                            {{ aspectRating.aspect.name }}
+                            <v-chip x-small v-if="aspectRating.aspect.is_user_created" class="user-created-chip">مخصص</v-chip>
+                          </div>
+                          <div class="feedback-aspect-rating">
+                            <v-rating
+                              :value="aspectRating.rating"
+                              color="amber"
+                              background-color="grey lighten-3"
+                              readonly
+                              dense
+                              small
+                            ></v-rating>
+                            <span class="aspect-rating-value">{{ aspectRating.rating }}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
                       <div v-if="isNewFeedback(feedback)" class="new-badge-container">
                         <v-chip small class="new-badge">
                           جديد
@@ -1003,6 +1029,72 @@ export default {
   }
   100% {
     box-shadow: 0 0 0 0 rgba(255, 90, 88, 0);
+  }
+}
+
+/* Feedback Aspect Ratings */
+.feedback-aspect-ratings {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.feedback-aspect-rating-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  padding: 4px 0;
+}
+
+.feedback-aspect-name {
+  font-size: 0.9rem;
+  color: #616161;
+  display: flex;
+  align-items: center;
+}
+
+.feedback-aspect-rating {
+  display: flex;
+  align-items: center;
+}
+
+.aspect-rating-value {
+  font-size: 0.9rem;
+  margin-left: 8px;
+  color: #F57C00;
+  font-weight: 500;
+}
+
+/* User-created aspect styling */
+.user-created-aspect {
+  background-color: rgba(255, 248, 225, 0.3);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.user-created-chip {
+  margin-right: 8px;
+  background-color: #FBC02D !important;
+  color: white;
+  font-size: 10px;
+  height: 16px !important;
+}
+
+/* Add responsive styles for aspect ratings on mobile */
+@media (max-width: 600px) {
+  .feedback-aspect-rating-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .feedback-aspect-rating {
+    margin-top: 4px;
+    align-self: flex-start;
+  }
+  
+  .feedback-aspect-name {
+    margin-bottom: 4px;
   }
 }
 </style>
